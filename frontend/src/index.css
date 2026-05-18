@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens ─────────────────────────────────────── */
+:root {
+  --color-bg: #FAF8F5;
+  --color-card: #FFFFFF;
+  --color-pink: #E8879A;
+  --color-pink-light: #F5C6D0;
+  --color-pink-dark: #D4687C;
+  --color-text: #1C1C1C;
+  --color-muted: #6B6B6B;
+  --color-border: #F0E0E5;
+  --color-surface: #FDF5F7;
+}
+
+/* ─── Base ──────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Grid Background Pattern ───────────────────────────── */
+.grid-bg {
+  background-color: var(--color-bg);
+  background-image:
+    linear-gradient(var(--color-pink-light) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-pink-light) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center center;
+  opacity: 1;
+}
+
+.grid-bg-subtle {
+  background-color: var(--color-bg);
+  background-image:
+    linear-gradient(rgba(245, 198, 208, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 198, 208, 0.35) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Typography ─────────────────────────────────────────── */
+.font-display {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-pink-light);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-pink);
+}
+
+/* ─── Infinite Scroll Animation ─────────────────────────── */
+@keyframes scrollLeft {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll-left {
+  animation: scrollLeft 30s linear infinite;
+}
+
+.animate-scroll-left:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Fade-in Animation ──────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* ─── Slide transitions ──────────────────────────────────── */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes slideOutLeft {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(-100%); opacity: 0; }
+}
+
+/* ─── Page transition ────────────────────────────────────── */
+.page-enter {
+  animation: fadeIn 0.35s ease-out;
+}
+
+/* ─── Image fallback ─────────────────────────────────────── */
+img {
+  display: block;
+}
+
+img.broken-fallback {
+  display: none;
+}
+
+/* ─── Focus ring ─────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-pink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Selection ──────────────────────────────────────────── */
+::selection {
+  background: var(--color-pink-light);
+  color: var(--color-text);
+}
+
+/* ─── Horizontal scrollable strip (no scrollbar shown) ──── */
+.scroll-strip {
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scroll-strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Cart badge pulse ───────────────────────────────────── */
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.2); }
+}
+.badge-pulse {
+  animation: pulse-badge 0.3s ease;
+}
+
+/* ─── Transition helpers ─────────────────────────────────── */
+.transition-base {
+  transition: all 0.2s ease;
+}
+
+/* ─── Hamburger ──────────────────────────────────────────── */
+@keyframes menuSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.menu-slide-down {
+  animation: menuSlideDown 0.22s ease;
+}
