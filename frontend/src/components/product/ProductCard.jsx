@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import Badge from "../ui/Badge";
-import { resolveImageUrl } from "../../api/client";
 import SafeImage from "../ui/SafeImage";
 
 // Simple local formatPrice fallback
@@ -41,7 +40,7 @@ export default function ProductCard({ product, compact = false }) {
       {/* Image area */}
       <div className={`relative overflow-hidden bg-[#FDF5F7] ${compact ? "aspect-[3/3.5]" : "aspect-[3/3.5]"}`}>
         <SafeImage
-          src={resolveImageUrl(product.primary_image_url)}
+          src={product.image || product.primary_image_url}
           alt={product.name}
           className="transition-transform duration-500 group-hover:scale-105"
         />

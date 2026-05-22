@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { resolveImageUrl } from "../../api/client";
 import SafeImage from "../ui/SafeImage";
 import { apiClient } from "../../api/client";
 
@@ -69,7 +68,7 @@ export default function TrendingStrip() {
             >
               <div className="w-full aspect-square rounded-2xl overflow-hidden bg-[#FDF5F7] border border-[#F0E0E5] group-hover:border-[#F5C6D0] transition-all mb-2.5">
                 <SafeImage
-                  src={resolveImageUrl(product.primary_image_url)}
+                  src={product.image || product.primary_image_url}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

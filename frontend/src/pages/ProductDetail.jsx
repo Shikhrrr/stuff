@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { apiClient, resolveImageUrl } from "../api/client";
+import { apiClient } from "../api/client";
 import SafeImage from "../components/ui/SafeImage";
 import ProductCard from "../components/product/ProductCard";
 import Badge from "../components/ui/Badge";
@@ -106,7 +106,7 @@ export default function ProductDetail() {
         <div className="flex flex-col gap-3">
           <div className="aspect-square rounded-3xl overflow-hidden bg-[#FDF5F7] border border-[#F0E0E5]">
             <SafeImage
-              src={resolveImageUrl(product.gallery[activeImage])}
+              src={product.gallery[activeImage]}
               alt={`${product.name} — view ${activeImage + 1}`}
               className="w-full h-full object-cover"
             />
@@ -122,7 +122,7 @@ export default function ProductDetail() {
                   }`}
                   aria-label={`View image ${i + 1}`}
                 >
-                  <SafeImage src={resolveImageUrl(img)} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+                  <SafeImage src={img} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

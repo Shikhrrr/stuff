@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { apiClient, resolveImageUrl } from "../api/client";
+import { apiClient } from "../api/client";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import SafeImage from "../components/ui/SafeImage";
@@ -191,7 +191,7 @@ export default function Checkout() {
                   {items.map((item) => (
                     <div key={item.key} className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl overflow-hidden border border-[#F0E0E5] flex-shrink-0">
-                        <SafeImage src={resolveImageUrl(item.product.primary_image_url)} alt={item.product.name} className="w-full h-full object-cover" />
+                        <SafeImage src={item.product.image || item.product.primary_image_url} alt={item.product.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium text-[#1C1C1C] truncate">{item.product.name}</p>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { resolveImageUrl } from "../api/client";
 import SafeImage from "../components/ui/SafeImage";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
@@ -160,7 +159,7 @@ export default function Profile() {
                 <div className="flex gap-2 mb-3">
                   {order.items.slice(0, 3).map((item, i) => (
                     <div key={i} className="w-12 h-12 rounded-xl overflow-hidden border border-[#F0E0E5] flex-shrink-0">
-                      <SafeImage src={resolveImageUrl(item.product_image || item.image || "")} alt={item.product_name || item.name} className="w-full h-full object-cover" />
+                      <SafeImage src={item.product_image || item.image || ""} alt={item.product_name || item.name} className="w-full h-full object-cover" />
                     </div>
                   ))}
                   {order.items.length > 3 && (

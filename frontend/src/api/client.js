@@ -1,11 +1,7 @@
 const API_URL = 'http://127.0.0.1:8000/api';
-const BASE_URL = 'http://127.0.0.1:8000';
 
-export const resolveImageUrl = (url) => {
-  if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  return `${BASE_URL}${url}`;
-};
+/** Product images are ImageKit CDN URLs — return as-is. */
+export const resolveImageUrl = (url) => url || '';
 
 export const getAuthToken = () => localStorage.getItem('access_token');
 export const setAuthToken = (token) => localStorage.setItem('access_token', token);

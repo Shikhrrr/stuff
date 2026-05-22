@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Plus, Edit2, Trash2, Loader2, X, Upload, Link as LinkIcon, Search } from 'lucide-react';
-import { apiClient, apiUpload, resolveImageUrl } from '../../api/client';
+import { apiClient, apiUpload } from '../../api/client';
 import { formatPrice } from '../../utils/formatters';
 
 const emptyForm = {
@@ -10,7 +10,7 @@ const emptyForm = {
   original_price: '',
   description: '',
   sizes: '',
-  primary_image_url: '',
+  image: '',
   in_stock: true,
   tags: '',
 };
@@ -29,7 +29,9 @@ export default function AdminProducts() {
   const [galleryUrls, setGalleryUrls] = useState([]);
   const [newUrl, setNewUrl] = useState('');
   const [newFiles, setNewFiles] = useState([]);
+  const [primaryImageFile, setPrimaryImageFile] = useState(null);
   const fileInputRef = useRef(null);
+  const primaryFileInputRef = useRef(null);
 
   const [existingGallery, setExistingGallery] = useState([]);
 
@@ -65,6 +67,7 @@ export default function AdminProducts() {
     setGalleryUrls([]);
     setNewUrl('');
     setNewFiles([]);
+    setPrimaryImageFile(null);
     setExistingGallery([]);
     setShowModal(true);
   };
@@ -78,13 +81,14 @@ export default function AdminProducts() {
       original_price: product.original_price || '',
       description: product.description || '',
       sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : '',
-      primary_image_url: product.primary_image_url || '',
+      image: product.image || product.primary_image_url || '',
       in_stock: product.in_stock ?? true,
       tags: Array.isArray(product.tags) ? product.tags.join(', ') : '',
     });
     setGalleryUrls([]);
     setNewUrl('');
     setNewFiles([]);
+    setPrimaryImageFile(null);
     setExistingGallery(Array.isArray(product.gallery) ? product.gallery : []);
     setShowModal(true);
   };
@@ -124,6 +128,32 @@ export default function AdminProducts() {
     setNewFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  const buildFormData = (allGalleryUrls) => {
+    const fd = new FormData();
+    fd.append('name', form.name);
+    fd.append('category', form.category);
+    fd.append('price', String(parseFloat(form.price)));
+    if (form.original_price) fd.append('original_price', String(parseFloat(form.original_price)));
+    fd.append('description', form.description);
+    fd.append('in_stock', form.in_stock ? 'true' : 'false');
+    if (form.image) fd.append('image', form.image);
+    if (primaryImageFile) fd.append('image_upload', primaryImageFile);
+    fd.append('sizes', JSON.stringify(form.sizes.split(',').map(s => s.trim()).filter(Boolean)));
+    fd.append('tags', JSON.stringify(form.tags.split(',').map(t => t.trim()).filter(Boolean)));
+    fd.append('gallery_image_urls', JSON.stringify(allGalleryUrls));
+    newFiles.forEach(file => fd.append('gallery_files', file));
+    return fd;
+  };
+
+  const formatApiError = (err) => {
+    if (!err || typeof err !== 'object') return 'Error saving product.';
+    const messages = Object.entries(err).flatMap(([key, val]) => {
+      const label = Array.isArray(val) ? val.join(', ') : String(val);
+      return [`${key}: ${label}`];
+    });
+    return messages.length ? messages.join('\n') : 'Error saving product.';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.category || !form.price) {
@@ -133,23 +163,11 @@ export default function AdminProducts() {
 
     setSaving(true);
     try {
-      const hasFiles = newFiles.length > 0;
+      const hasUploads = Boolean(primaryImageFile) || newFiles.length > 0;
       const allGalleryUrls = [...existingGallery, ...galleryUrls];
 
-      if (hasFiles) {
-        const fd = new FormData();
-        fd.append('name', form.name);
-        fd.append('category', form.category);
-        fd.append('price', String(parseFloat(form.price)));
-        if (form.original_price) fd.append('original_price', String(parseFloat(form.original_price)));
-        fd.append('description', form.description);
-        fd.append('in_stock', form.in_stock ? 'true' : 'false');
-        fd.append('primary_image_url', form.primary_image_url);
-        fd.append('sizes', JSON.stringify(form.sizes.split(',').map(s => s.trim()).filter(Boolean)));
-        fd.append('tags', JSON.stringify(form.tags.split(',').map(t => t.trim()).filter(Boolean)));
-        fd.append('gallery_image_urls', JSON.stringify(allGalleryUrls));
-        newFiles.forEach(file => fd.append('gallery_files', file));
-
+      if (hasUploads) {
+        const fd = buildFormData(allGalleryUrls);
         if (editing) {
           await apiUpload(`/products/${editing.id}/`, fd, { method: 'PUT' });
         } else {
@@ -163,7 +181,7 @@ export default function AdminProducts() {
           original_price: form.original_price ? parseFloat(form.original_price) : null,
           description: form.description,
           sizes: form.sizes.split(',').map(s => s.trim()).filter(Boolean),
-          primary_image_url: form.primary_image_url,
+          image: form.image || null,
           in_stock: form.in_stock,
           tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         };
@@ -182,7 +200,7 @@ export default function AdminProducts() {
       await fetchProducts();
     } catch (err) {
       console.error("Failed to save product", err);
-      alert('Error saving product. Check console for details.');
+      alert(formatApiError(err));
     } finally {
       setSaving(false);
     }
@@ -279,8 +297,8 @@ export default function AdminProducts() {
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                        {product.primary_image_url && (
-                          <img src={resolveImageUrl(product.primary_image_url)} alt={product.name} className="w-full h-full object-cover" />
+                        {(product.image || product.primary_image_url) && (
+                          <img src={product.image || product.primary_image_url} alt={product.name} className="w-full h-full object-cover" />
                         )}
                       </div>
                       <div className="min-w-0">
@@ -290,7 +308,7 @@ export default function AdminProducts() {
                             {product.gallery.slice(0, 4).map((url, i) => (
                               <img
                                 key={i}
-                                src={resolveImageUrl(url)}
+                                src={url}
                                 alt=""
                                 className="w-5 h-5 rounded object-cover border border-[#F0E0E5]"
                                 onError={(e) => { e.target.style.display = 'none'; }}
@@ -450,15 +468,54 @@ export default function AdminProducts() {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-[#1C1C1C] mb-1">Primary Image URL</label>
-                  <input
-                    type="url"
-                    name="primary_image_url"
-                    value={form.primary_image_url}
-                    onChange={handleChange}
-                    placeholder="https://..."
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#E0D0D5] text-sm focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40"
-                  />
+                  <label className="block text-sm font-medium text-[#1C1C1C] mb-1">Primary Image</label>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="url"
+                      name="image"
+                      value={form.image}
+                      onChange={handleChange}
+                      placeholder="CDN / external image URL (optional)"
+                      className="flex-1 px-4 py-2.5 rounded-xl border border-[#E0D0D5] text-sm focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => primaryFileInputRef.current?.click()}
+                      className="px-3 py-2 rounded-xl bg-[#FDE8EE] text-[#E8879A] text-sm font-medium hover:bg-[#F5C6D0] transition-colors flex items-center gap-1 whitespace-nowrap"
+                    >
+                      <Upload className="w-4 h-4" />
+                      Upload
+                    </button>
+                    <input
+                      ref={primaryFileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(e) => setPrimaryImageFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                    />
+                  </div>
+                  {(form.image || primaryImageFile) && (
+                    <div className="flex items-center gap-2">
+                      {primaryImageFile ? (
+                        <img
+                          src={URL.createObjectURL(primaryImageFile)}
+                          alt="Primary preview"
+                          className="w-16 h-16 rounded-lg object-cover border border-[#F0E0E5]"
+                        />
+                      ) : form.image ? (
+                        <img src={form.image} alt="Primary" className="w-16 h-16 rounded-lg object-cover border border-[#F0E0E5]" />
+                      ) : null}
+                      {primaryImageFile && (
+                        <button
+                          type="button"
+                          onClick={() => setPrimaryImageFile(null)}
+                          className="text-xs text-red-500 hover:underline"
+                        >
+                          Remove upload
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -472,7 +529,7 @@ export default function AdminProducts() {
                     {existingGallery.map((url, i) => (
                       <div key={`existing-${i}`} className="relative group">
                         <img
-                          src={resolveImageUrl(url)}
+                          src={url}
                           alt=""
                           className="w-16 h-16 rounded-lg object-cover border border-[#F0E0E5]"
                           onError={(e) => { e.target.style.display = 'none'; }}
@@ -494,7 +551,7 @@ export default function AdminProducts() {
                   <div className="flex flex-wrap gap-2 mb-3">
                     {galleryUrls.map((url, i) => (
                       <div key={`url-${i}`} className="relative group">
-                        <img src={resolveImageUrl(url)} alt="" className="w-16 h-16 rounded-lg object-cover border border-[#F0E0E5]" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <img src={url} alt="" className="w-16 h-16 rounded-lg object-cover border border-[#F0E0E5]" onError={(e) => { e.target.style.display = 'none'; }} />
                         <span className="absolute bottom-0 left-0 right-0 text-[8px] bg-black/60 text-white truncate px-1 rounded-b-lg">URL</span>
                         <button
                           type="button"
@@ -560,7 +617,7 @@ export default function AdminProducts() {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     multiple
                     onChange={handleFilesSelected}
                     className="hidden"

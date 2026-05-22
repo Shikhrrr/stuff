@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { apiClient, resolveImageUrl } from "../api/client";
+import { apiClient } from "../api/client";
 import SafeImage from "../components/ui/SafeImage";
 import Badge from "../components/ui/Badge";
 
@@ -76,7 +76,7 @@ function OrderCard({ order, onCancel }) {
           <div key={i} className="flex items-center gap-3 py-2 border-t border-[#F0E0E5] first:border-t-0 first:pt-0">
             <div className="w-14 h-14 rounded-xl overflow-hidden border border-[#F0E0E5] flex-shrink-0 bg-[#FDF5F7]">
               {/* If using real API data, item may just have product_name, otherwise fallback to item.image */}
-              <SafeImage src={resolveImageUrl(item.product_image || item.image || "")} alt={item.product_name || item.name} className="w-full h-full object-cover" />
+              <SafeImage src={item.product_image || item.image || ""} alt={item.product_name || item.name} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-[#1C1C1C] truncate">{item.product_name || item.name}</p>
