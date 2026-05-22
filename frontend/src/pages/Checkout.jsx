@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { formatPrice } from "../data/products";
+import { useAuth } from "../context/AuthContext";
+import { apiClient, resolveImageUrl } from "../api/client";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import SafeImage from "../components/ui/SafeImage";
+
+// Simple local formatPrice fallback
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(price);
 
 const PAYMENT_METHODS = [
   { id: "card", label: "Credit / Debit Card", icon: "💳" },
@@ -38,15 +43,29 @@ export default function Checkout() {
     return e;
   };
 
+  const { refreshOrders } = useAuth();
+
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    setSuccess(true);
-    clearCart();
+    try {
+      const shippingAddress = `${form.fullName}, ${form.phone}, ${form.address}, ${form.city}, ${form.state} - ${form.pincode}`;
+      await apiClient('/orders/', {
+        method: 'POST',
+        body: { shipping_address: shippingAddress },
+      });
+      await clearCart();
+      await refreshOrders();
+      setSuccess(true);
+    } catch (err) {
+      console.error("Order placement failed", err);
+      const msg = err?.error || 'Failed to place order. Please try again.';
+      setErrors({ address: msg });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const set = (f) => (e) => {
@@ -172,7 +191,7 @@ export default function Checkout() {
                   {items.map((item) => (
                     <div key={item.key} className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl overflow-hidden border border-[#F0E0E5] flex-shrink-0">
-                        <SafeImage src={item.product.image} alt={item.product.name} className="w-full h-full object-cover" />
+                        <SafeImage src={resolveImageUrl(item.product.primary_image_url)} alt={item.product.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium text-[#1C1C1C] truncate">{item.product.name}</p>

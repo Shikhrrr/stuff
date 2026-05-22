@@ -1,31 +1,54 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { heroSlides } from "../../data/products";
 import SafeImage from "../ui/SafeImage";
+import { apiClient } from "../../api/client";
 
 export default function HeroCarousel() {
+  const [heroSlides, setHeroSlides] = useState([]);
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const data = await apiClient('/store/slides/');
+        setHeroSlides(data);
+      } catch (err) {
+        console.error("Failed to fetch slides", err);
+      }
+    };
+    fetchSlides();
+  }, []);
+
   const goTo = useCallback(
     (idx) => {
-      if (isTransitioning) return;
+      if (isTransitioning || heroSlides.length === 0) return;
       setIsTransitioning(true);
       setCurrent(idx);
       setTimeout(() => setIsTransitioning(false), 600);
     },
-    [isTransitioning]
+    [isTransitioning, heroSlides.length]
   );
 
   const next = useCallback(() => {
+    if (heroSlides.length === 0) return;
     goTo((current + 1) % heroSlides.length);
-  }, [current, goTo]);
+  }, [current, goTo, heroSlides.length]);
 
   // Auto-slide every 4s
   useEffect(() => {
+    if (heroSlides.length === 0) return;
     const timer = setInterval(next, 4000);
     return () => clearInterval(timer);
-  }, [next]);
+  }, [next, heroSlides.length]);
+
+  if (heroSlides.length === 0) {
+    return (
+      <section className="w-full bg-[#FAF8F5] animate-pulse flex items-center justify-center" style={{ height: "min(90vh, 680px)" }}>
+        <div className="w-10 h-10 border-4 border-[#E8879A] border-t-transparent rounded-full animate-spin"></div>
+      </section>
+    );
+  }
 
   const slide = heroSlides[current];
 
@@ -41,7 +64,7 @@ export default function HeroCarousel() {
           aria-hidden={i !== current}
         >
           <SafeImage
-            src={s.image}
+            src={s.image_url}
             alt={`${s.title} ${s.highlight}`}
             className="w-full h-full object-cover object-top"
           />
@@ -63,7 +86,7 @@ export default function HeroCarousel() {
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-2">
               {slide.title}
               <br />
-              <span style={{ color: slide.accent }}>{slide.highlight}</span>
+              <span style={{ color: slide.accent_color }}>{slide.highlight}</span>
             </h1>
             <p className="text-white/80 text-base sm:text-lg mb-8 max-w-md">
               {slide.subtitle}
@@ -119,3 +142,4 @@ export default function HeroCarousel() {
     </section>
   );
 }
+

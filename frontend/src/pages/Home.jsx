@@ -1,7 +1,11 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Search, ArrowLeft, Loader2 } from "lucide-react";
+import { apiClient } from "../api/client";
 import HeroCarousel from "../components/home/HeroCarousel";
 import TrendingStrip from "../components/home/TrendingStrip";
 import CategoryStrip from "../components/home/CategoryStrip";
+import ProductCard from "../components/product/ProductCard";
 
 const categories = [
   {
@@ -21,7 +25,102 @@ const categories = [
   },
 ];
 
+function SearchResults({ query }) {
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      setLoading(true);
+      try {
+        const data = await apiClient(`/products/?search=${encodeURIComponent(query)}`);
+        setResults(data);
+      } catch (err) {
+        console.error("Search failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchResults();
+  }, [query]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 animate-spin text-[#E8879A]" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid-bg-subtle min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#1C1C1C]">
+            Search results for "{query}"
+          </h1>
+          <p className="text-sm text-[#6B6B6B] mt-1">{results.length} product{results.length !== 1 ? 's' : ''} found</p>
+        </div>
+
+        {results.length > 0 ? (
+          <>
+            {/* First two rows of results */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+              {results.slice(0, 8).map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+
+            {results.length > 8 && (
+              <div className="text-center mt-8">
+                <Link
+                  to={`/women?search=${encodeURIComponent(query)}`}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-[#E8879A] hover:underline underline-offset-2"
+                >
+                  View all {results.length} results →
+                </Link>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-full bg-[#FDE8EE] flex items-center justify-center mx-auto mb-4">
+              <Search className="w-7 h-7 text-[#E8879A]" />
+            </div>
+            <p className="text-[#6B6B6B] text-sm mb-6">No products found matching your search.</p>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 bg-[#E8879A] text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-[#D4687C] transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Homepage
+            </Link>
+          </div>
+        )}
+
+        {/* Back to Homepage link */}
+        <div className="text-center mt-10 pt-8 border-t border-[#F0E0E5]">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[#6B6B6B] hover:text-[#E8879A] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Homepage
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get('q');
+
+  if (query) {
+    return <SearchResults query={query} />;
+  }
+
   return (
     <div>
       {/* Hero */}
@@ -39,21 +138,18 @@ export default function Home() {
                 to: "/women",
                 label: "Women",
                 desc: "Shop the season's must-haves",
-                // Blush heeled pumps on soft surface — elegant, feminine
                 image: "https://images.unsplash.com/photo-1518049362265-d5b2a6467637?auto=format&fit=crop&w=800&q=80",
               },
               {
                 to: "/men",
                 label: "Men",
                 desc: "Classic & contemporary styles",
-                // Men's suede Chelsea boot — clean, minimal, sophisticated
                 image: "https://images.unsplash.com/photo-1605408499391-6368c628ef42?auto=format&fit=crop&w=800&q=80",
               },
               {
                 to: "/kids",
                 label: "Kids",
                 desc: "Fun, durable footwear",
-                // Bright kids' sports shoes — active, colourful, clearly kid-focused
                 image: "https://images.unsplash.com/photo-1587563871167-1ee9c731aefb?auto=format&fit=crop&w=800&q=80",
               },
             ].map(({ to, label, desc, image }) => (
@@ -63,16 +159,13 @@ export default function Home() {
                 className="group relative overflow-hidden rounded-2xl aspect-[3/4] sm:aspect-[2/3] block"
                 aria-label={`Shop ${label}'s shoes`}
               >
-                {/* Photo */}
                 <img
                   src={image}
                   alt={`${label}'s shoes`}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   loading="lazy"
                 />
-                {/* Gradient overlay — stronger at bottom */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
-                {/* Text */}
                 <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
                   <p className="font-display font-bold text-white text-lg sm:text-2xl leading-tight">
                     {label}

@@ -1,50 +1,93 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { apiClient, getAuthToken } from "../api/client";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem("shikhar_cart");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [items, setItems] = useState([]);
+  const { user } = useAuth(); // Re-fetch cart when user logs in/out
 
-  // Persist to localStorage on change
-  useEffect(() => {
-    localStorage.setItem("shikhar_cart", JSON.stringify(items));
-  }, [items]);
-
-  const addToCart = (product, size, quantity = 1) => {
-    const key = `${product.id}-${size}`;
-    setItems((prev) => {
-      const existing = prev.find((i) => i.key === key);
-      if (existing) {
-        return prev.map((i) =>
-          i.key === key ? { ...i, quantity: i.quantity + quantity } : i
-        );
-      }
-      return [...prev, { key, product, size, quantity }];
-    });
-  };
-
-  const removeFromCart = (key) => {
-    setItems((prev) => prev.filter((i) => i.key !== key));
-  };
-
-  const updateQuantity = (key, quantity) => {
-    if (quantity <= 0) {
-      removeFromCart(key);
+  const fetchCart = async () => {
+    if (!getAuthToken()) {
+      setItems([]);
       return;
     }
-    setItems((prev) =>
-      prev.map((i) => (i.key === key ? { ...i, quantity } : i))
-    );
+    try {
+      const data = await apiClient('/cart/');
+      if (data && data.items) {
+        // Map API format to expected frontend format
+        const formattedItems = data.items.map(item => ({
+          apiId: item.id,
+          key: `${item.product}-${item.size}`,
+          product: item.product_details,
+          size: item.size,
+          quantity: item.quantity
+        }));
+        setItems(formattedItems);
+      }
+    } catch (err) {
+      console.error("Error fetching cart", err);
+    }
   };
 
-  const clearCart = () => setItems([]);
+  useEffect(() => {
+    fetchCart();
+  }, [user]); // Re-run when auth state changes
+
+  const addToCart = async (product, size, quantity = 1) => {
+    if (!getAuthToken()) {
+      alert("Please log in to add items to your cart.");
+      return;
+    }
+    try {
+      await apiClient('/cart/items/', {
+        body: { product: product.id, size, quantity }
+      });
+      await fetchCart();
+    } catch (err) {
+      console.error("Error adding to cart", err);
+    }
+  };
+
+  const removeFromCart = async (key) => {
+    const item = items.find(i => i.key === key);
+    if (!item) return;
+    try {
+      await apiClient(`/cart/items/${item.apiId}/`, { method: 'DELETE' });
+      await fetchCart();
+    } catch (err) {
+      console.error("Error removing from cart", err);
+    }
+  };
+
+  const updateQuantity = async (key, quantity) => {
+    if (quantity <= 0) {
+      return removeFromCart(key);
+    }
+    const item = items.find(i => i.key === key);
+    if (!item) return;
+    
+    try {
+      // The API expects full fields on update or we can use PATCH
+      await apiClient(`/cart/items/${item.apiId}/`, {
+        method: 'PATCH',
+        body: { quantity }
+      });
+      await fetchCart();
+    } catch (err) {
+      console.error("Error updating cart", err);
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      await apiClient('/cart/clear/', { method: 'POST' });
+      await fetchCart();
+    } catch (err) {
+      console.error("Error clearing cart", err);
+    }
+  };
 
   const cartCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const cartTotal = items.reduce(

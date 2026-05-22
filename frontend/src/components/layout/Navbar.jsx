@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -14,9 +14,11 @@ export default function Navbar() {
   const { cartCount } = useCart();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
   useEffect(() => {
     const onScroll = () => {
@@ -69,15 +71,51 @@ export default function Navbar() {
             </span>
           </Link>
 
+          {/* Desktop Search */}
+          <div className="hidden md:flex flex-1 max-w-md mx-6">
+            <div className="relative w-full">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#BCBCBC] pointer-events-none">
+                <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clipRule="evenodd"/>
+              </svg>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const q = searchQuery.trim();
+                    if (q) {
+                      navigate(`/?q=${encodeURIComponent(q)}`);
+                    } else {
+                      navigate('/');
+                    }
+                  }
+                }}
+                placeholder="Search products..."
+                className="w-full pl-10 pr-4 py-2 rounded-full bg-[#FDF5F7] border border-[#F0E0E5] text-sm text-[#1C1C1C] placeholder:text-[#BCBCBC] focus:outline-none focus:ring-2 focus:ring-[#E8879A] focus:border-[#E8879A] transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => { setSearchQuery(''); navigate('/'); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#BCBCBC] hover:text-[#6B6B6B] transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+                    <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-5">
             {navLinks.map(({ to, label }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={to === "/"}
                 className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-150 ${
+                  `text-sm font-medium transition-colors duration-150 whitespace-nowrap ${
                     isActive ? activeClass : inactiveClass
                   }`
                 }
@@ -140,6 +178,16 @@ export default function Navbar() {
                 </span>
               )}
             </NavLink>
+
+            {/* Admin Button */}
+            {user?.is_staff || user?.is_superuser ? (
+              <Link
+                to="/control-panel"
+                className="text-sm font-medium bg-[#E8879A] text-white px-4 py-2 rounded-full hover:bg-[#D4687C] transition-colors"
+              >
+                Admin
+              </Link>
+            ) : null}
 
             {/* Profile / Auth */}
             {user ? (
@@ -234,10 +282,41 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="md:hidden menu-slide-down border-t border-[#F0E0E5] pb-4 bg-[#FAF8F5]">
-            <div className="flex flex-col py-2 gap-1">
+          {/* Mobile Search + Profile Row */}
+          <div className="md:hidden border-t border-[#F0E0E5] bg-[#FAF8F5] px-4 py-2 flex items-center gap-2">
+            <div className="relative flex-1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#BCBCBC] pointer-events-none">
+                <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clipRule="evenodd"/>
+              </svg>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const q = searchQuery.trim();
+                    navigate(q ? `/?q=${encodeURIComponent(q)}` : '/');
+                  }
+                }}
+                placeholder="Search products..."
+                className="w-full pl-9 pr-3 py-2 rounded-full bg-white border border-[#F0E0E5] text-sm text-[#1C1C1C] placeholder:text-[#BCBCBC] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
+              />
+            </div>
+            {user ? (
+              <Link to="/profile" className="flex-shrink-0 w-8 h-8 rounded-full bg-[#E8879A] text-white flex items-center justify-center text-xs font-bold">
+                {user.fullName?.[0]?.toUpperCase() || "U"}
+              </Link>
+            ) : (
+              <Link to="/login" className="flex-shrink-0 text-sm font-medium text-[#6B6B6B] hover:text-[#E8879A] transition-colors px-2">
+                Login
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile Menu */}
+          {menuOpen && (
+            <div className="md:hidden menu-slide-down border-t border-[#F0E0E5] pb-4 bg-[#FAF8F5]">
+              <div className="flex flex-col py-2 gap-1">
               {navLinks.map(({ to, label }) => (
                 <NavLink
                   key={to}
@@ -280,6 +359,15 @@ export default function Navbar() {
               <div className="h-px bg-[#F0E0E5] mx-4 my-2" />
               {user ? (
                 <>
+                  {(user?.is_staff || user?.is_superuser) && (
+                    <Link
+                      to="/control-panel"
+                      onClick={() => setMenuOpen(false)}
+                      className="px-4 py-2.5 text-sm font-medium rounded-lg mx-2 text-white bg-[#E8879A] hover:bg-[#D4687C] transition-colors block text-center"
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
                   <NavLink
                     to="/profile"
                     onClick={() => setMenuOpen(false)}

@@ -1,25 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
-import { getProductsByCategory } from "../data/products";
 import ProductCard from "../components/product/ProductCard";
-
-const CATEGORY_META = {
-  women: {
-    label: "Women's Shoes",
-    description: "From timeless ballet flats to statement heels — discover footwear that moves with you.",
-    emoji: "👠",
-  },
-  men: {
-    label: "Men's Shoes",
-    description: "Classic craftsmanship meets modern design. Built for every occasion.",
-    emoji: "👞",
-  },
-  kids: {
-    label: "Kids' Shoes",
-    description: "Durable, fun, and comfortable — shoes that keep up with little adventurers.",
-    emoji: "👟",
-  },
-};
+import { apiClient } from "../api/client";
 
 const SORT_OPTIONS = [
   { value: "default", label: "Featured" },
@@ -32,15 +14,37 @@ const SORT_OPTIONS = [
 export default function CategoryPage() {
   const { category: paramCategory } = useParams();
   const { pathname } = useLocation();
-  // Derive category from pathname if not from route param
-  const category = paramCategory || pathname.replace(/^\//, "").split("/")[0] || "women";
-  const meta = CATEGORY_META[category] || { label: "Shoes", description: "", emoji: "👟" };
-  const allProducts = getProductsByCategory(category);
+  const categoryId = paramCategory || pathname.replace(/^\//, "").split("/")[0] || "women";
 
+  const [meta, setMeta] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
   const [sort, setSort] = useState("default");
   const [tagFilter, setTagFilter] = useState("all");
 
   const tags = ["all", "trending", "new", "bestseller"];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [catData, prodData] = await Promise.all([
+          apiClient(`/categories/${categoryId}/`),
+          apiClient(`/products/?category=${categoryId}`)
+        ]);
+        setMeta(catData);
+        setAllProducts(prodData);
+      } catch (err) {
+        console.error("Error fetching category data", err);
+        setMeta({ label: "Shoes", description: "", emoji: "👟" });
+        setAllProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [categoryId]);
 
   const filtered = allProducts
     .filter((p) => tagFilter === "all" || p.tags.includes(tagFilter))
@@ -48,8 +52,17 @@ export default function CategoryPage() {
       if (sort === "price-asc") return a.price - b.price;
       if (sort === "price-desc") return b.price - a.price;
       if (sort === "rating") return b.rating - a.rating;
+      if (sort === "newest") return new Date(b.created_at) - new Date(a.created_at);
       return 0;
     });
+
+  if (loading) {
+    return (
+      <div className="grid-bg-subtle min-h-screen flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#E8879A] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid-bg-subtle min-h-screen">

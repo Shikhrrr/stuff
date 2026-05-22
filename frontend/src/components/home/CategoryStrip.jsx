@@ -1,10 +1,45 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getProductsByCategory } from "../../data/products";
 import ProductCard from "../product/ProductCard";
+import { apiClient } from "../../api/client";
 
 export default function CategoryStrip({ category, label, description }) {
-  const products = getProductsByCategory(category).slice(0, 8);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const categoryPath = `/${category}`;
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await apiClient(`/products/?category=${category}`);
+        // We only want to show 8 items max on the home page strip
+        setProducts(data.slice(0, 8));
+      } catch (err) {
+        console.error("Failed to fetch products for category", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [category]);
+
+  if (loading) {
+    return (
+      <section className="py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="h-6 w-32 bg-gray-200 rounded mb-2 animate-pulse"></div>
+          <div className="h-8 w-48 bg-gray-300 rounded animate-pulse mb-6"></div>
+          <div className="flex gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="w-48 h-64 bg-gray-100 rounded-2xl animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (products.length === 0) return null;
 
   return (
     <section className="py-10">

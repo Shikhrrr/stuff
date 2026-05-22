@@ -1,22 +1,62 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getProductById, getRelatedProducts, formatPrice } from "../data/products";
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { apiClient, resolveImageUrl } from "../api/client";
 import SafeImage from "../components/ui/SafeImage";
 import ProductCard from "../components/product/ProductCard";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 
+// Simple local formatPrice fallback
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(price);
+
 export default function ProductDetail() {
   const { id } = useParams();
-  const product = getProductById(id);
   const { addToCart } = useCart();
+  const navigate = useNavigate();
+
+  const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [added, setAdded] = useState(false);
   const [sizeError, setSizeError] = useState(false);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        const [prodData, relatedData] = await Promise.all([
+          apiClient(`/products/${id}/`),
+          apiClient(`/products/${id}/related/`)
+        ]);
+        setProduct(prodData);
+        setRelated(relatedData);
+        // Reset selections when product changes
+        setActiveImage(0);
+        setSelectedSize(null);
+        setQuantity(1);
+      } catch (err) {
+        console.error("Failed to fetch product", err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#E8879A] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -29,9 +69,8 @@ export default function ProductDetail() {
     );
   }
 
-  const related = getRelatedProducts(product);
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discount = product.original_price
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : null;
 
   const handleAddToCart = () => {
@@ -40,6 +79,13 @@ export default function ProductDetail() {
     addToCart(product, selectedSize, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    if (!selectedSize) { setSizeError(true); return; }
+    setSizeError(false);
+    addToCart(product, selectedSize, quantity);
+    navigate('/checkout');
   };
 
   return (
@@ -60,7 +106,7 @@ export default function ProductDetail() {
         <div className="flex flex-col gap-3">
           <div className="aspect-square rounded-3xl overflow-hidden bg-[#FDF5F7] border border-[#F0E0E5]">
             <SafeImage
-              src={product.gallery[activeImage]}
+              src={resolveImageUrl(product.gallery[activeImage])}
               alt={`${product.name} — view ${activeImage + 1}`}
               className="w-full h-full object-cover"
             />
@@ -76,7 +122,7 @@ export default function ProductDetail() {
                   }`}
                   aria-label={`View image ${i + 1}`}
                 >
-                  <SafeImage src={img} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+                  <SafeImage src={resolveImageUrl(img)} alt={`${product.name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -90,32 +136,22 @@ export default function ProductDetail() {
             {product.tags.includes("trending") && <Badge variant="amber">Trending</Badge>}
             {product.tags.includes("new") && <Badge variant="blue">New Arrival</Badge>}
             {product.tags.includes("bestseller") && <Badge variant="pink">Bestseller</Badge>}
-            {!product.inStock && <Badge variant="gray">Out of Stock</Badge>}
+            {!product.in_stock && <Badge variant="gray">Out of Stock</Badge>}
           </div>
 
-          {/* Name & rating */}
+          {/* Name */}
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#1C1C1C] leading-tight mb-2">
               {product.name}
             </h1>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <svg key={s} viewBox="0 0 16 16" className={`w-4 h-4 ${s <= Math.round(product.rating) ? "text-amber-400" : "text-gray-200"}`} fill="currentColor">
-                    <path d="M7.657 2.036a.4.4 0 0 1 .686 0l1.657 2.9 3.217.606a.4.4 0 0 1 .21.67L11.2 8.425l.477 3.242a.4.4 0 0 1-.573.41L8 10.605l-3.104 1.472a.4.4 0 0 1-.573-.41l.477-3.242L2.573 6.212a.4.4 0 0 1 .21-.67l3.217-.606 1.657-2.9Z"/>
-                  </svg>
-                ))}
-              </div>
-              <span className="text-sm text-[#6B6B6B]">{product.rating} ({product.reviews} reviews)</span>
-            </div>
           </div>
 
           {/* Price */}
           <div className="flex items-baseline gap-3">
             <span className="text-3xl font-bold text-[#1C1C1C]">{formatPrice(product.price)}</span>
-            {product.originalPrice && (
+            {product.original_price && (
               <>
-                <span className="text-lg text-[#BCBCBC] line-through">{formatPrice(product.originalPrice)}</span>
+                <span className="text-lg text-[#BCBCBC] line-through">{formatPrice(product.original_price)}</span>
                 {discount && <Badge variant="pink">{discount}% off</Badge>}
               </>
             )}
@@ -178,10 +214,10 @@ export default function ProductDetail() {
             </div>
 
             <Button
-              variant="primary"
-              size="lg"
+              variant="secondary"
+              size="md"
               onClick={handleAddToCart}
-              disabled={!product.inStock}
+              disabled={!product.in_stock}
               className="flex-1"
             >
               {added ? (
@@ -191,7 +227,7 @@ export default function ProductDetail() {
                   </svg>
                   Added to Cart!
                 </span>
-              ) : !product.inStock ? (
+              ) : !product.in_stock ? (
                 "Out of Stock"
               ) : (
                 <span className="flex items-center gap-2">
@@ -204,21 +240,24 @@ export default function ProductDetail() {
                 </span>
               )}
             </Button>
+            {product.in_stock && (
+              <Button
+                variant="primary"
+                size="md"
+                onClick={handleBuyNow}
+                className="flex-1"
+              >
+                <span className="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                    <path d="M11.983 1.907a.75.75 0 0 0-1.292-.657l-8.5 9.5A.75.75 0 0 0 2.75 12h6.572l-1.305 6.093a.75.75 0 0 0 1.292.657l8.5-9.5A.75.75 0 0 0 17.25 8h-6.572l1.305-6.093Z" />
+                  </svg>
+                  Buy Now
+                </span>
+              </Button>
+            )}
           </div>
 
-          {/* Trust badges */}
-          <div className="flex flex-wrap gap-4 pt-3 border-t border-[#F0E0E5]">
-            {[
-              { icon: "🚚", text: "Free delivery over ₹2000" },
-              { icon: "↩️", text: "Easy 7-day returns" },
-              { icon: "✅", text: "Authentic products" },
-            ].map(({ icon, text }) => (
-              <div key={text} className="flex items-center gap-2 text-xs text-[#6B6B6B]">
-                <span>{icon}</span>
-                <span>{text}</span>
-              </div>
-            ))}
-          </div>
+
         </div>
       </div>
 

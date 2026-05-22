@@ -1,20 +1,24 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { formatPrice } from "../data/products";
+import { resolveImageUrl } from "../api/client";
 import SafeImage from "../components/ui/SafeImage";
 import Button from "../components/ui/Button";
 
+// Simple local formatPrice fallback
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(price);
+
 function CartItem({ item, onUpdateQty, onRemove }) {
   const { product, size, quantity, key } = item;
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discount = product.original_price
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : null;
 
   return (
     <div className="flex gap-4 py-5 border-b border-[#F0E0E5] last:border-b-0 animate-fade-in">
       {/* Image */}
       <Link to={`/product/${product.id}`} className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden border border-[#F0E0E5] bg-[#FDF5F7]">
-        <SafeImage src={product.image} alt={product.name} className="w-full h-full object-cover" />
+        <SafeImage src={resolveImageUrl(product.primary_image_url)} alt={product.name} className="w-full h-full object-cover" />
       </Link>
 
       {/* Details */}

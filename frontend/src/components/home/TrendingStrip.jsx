@@ -1,10 +1,42 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getTrendingProducts } from "../../data/products";
-import { formatPrice } from "../../data/products";
+import { resolveImageUrl } from "../../api/client";
 import SafeImage from "../ui/SafeImage";
+import { apiClient } from "../../api/client";
+
+// Simple local formatPrice fallback since we are deleting products.js soon
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(price);
 
 export default function TrendingStrip() {
-  const trending = getTrendingProducts();
+  const [trending, setTrending] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        const data = await apiClient('/products/trending/');
+        setTrending(data);
+      } catch (err) {
+        console.error("Failed to fetch trending products", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTrending();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-12 bg-[#FAF8F5] animate-pulse">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+          <div className="h-6 w-32 bg-gray-200 rounded mb-2"></div>
+          <div className="h-8 w-48 bg-gray-300 rounded"></div>
+        </div>
+      </section>
+    );
+  }
+
   // Duplicate for seamless infinite loop
   const doubled = [...trending, ...trending];
 
@@ -27,7 +59,7 @@ export default function TrendingStrip() {
 
       {/* Infinite scroll track */}
       <div className="relative flex overflow-hidden">
-        <div className="flex animate-scroll-left gap-4 pl-4">
+        <div className="flex animate-scroll-left gap-4 pl-4 hover:[animation-play-state:paused]">
           {doubled.map((product, idx) => (
             <Link
               key={`${product.id}-${idx}`}
@@ -37,7 +69,7 @@ export default function TrendingStrip() {
             >
               <div className="w-full aspect-square rounded-2xl overflow-hidden bg-[#FDF5F7] border border-[#F0E0E5] group-hover:border-[#F5C6D0] transition-all mb-2.5">
                 <SafeImage
-                  src={product.image}
+                  src={resolveImageUrl(product.primary_image_url)}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

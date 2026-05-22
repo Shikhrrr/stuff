@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { formatPrice } from "../data/products";
+import { resolveImageUrl } from "../api/client";
 import SafeImage from "../components/ui/SafeImage";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+
+// Simple local formatPrice fallback
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(price);
 
 const STATUS_BADGE = {
   Delivered: "green",
@@ -43,7 +47,8 @@ export default function Profile() {
     setEditing(false);
   };
 
-  const recentOrders = orders.slice(0, 2);
+  const safeOrders = orders || [];
+  const recentOrders = safeOrders.slice(0, 2);
 
   return (
     <div className="grid-bg-subtle min-h-screen py-10">
@@ -61,7 +66,7 @@ export default function Profile() {
               <div>
                 <h2 className="text-lg font-semibold text-[#1C1C1C]">{user.fullName}</h2>
                 <p className="text-sm text-[#6B6B6B]">{user.email}</p>
-                <p className="text-xs text-[#BCBCBC] mt-0.5">Member since {user.joinedDate}</p>
+                <p className="text-xs text-[#BCBCBC] mt-0.5">Member since {user.joinedDate || "recently"}</p>
               </div>
             </div>
 
@@ -90,8 +95,8 @@ export default function Profile() {
                 {[
                   { label: "Full Name", value: user.fullName, icon: "👤" },
                   { label: "Email", value: user.email, icon: "✉️" },
-                  { label: "Phone", value: user.phone, icon: "📞" },
-                  { label: "Address", value: user.address, icon: "📍" },
+                  { label: "Phone", value: user.phone || "-", icon: "📞" },
+                  { label: "Address", value: user.address || "-", icon: "📍" },
                 ].map(({ label, value, icon }) => (
                   <div key={label} className="flex items-start gap-3">
                     <span className="text-lg mt-0.5">{icon}</span>
@@ -118,9 +123,9 @@ export default function Profile() {
             <div className="bg-white rounded-2xl border border-[#F0E0E5] p-5">
               <h3 className="text-sm font-semibold text-[#1C1C1C] mb-4">Account Stats</h3>
               {[
-                { label: "Total Orders", value: orders.length },
-                { label: "Delivered", value: orders.filter((o) => o.status === "Delivered").length },
-                { label: "Processing", value: orders.filter((o) => o.status === "Processing").length },
+                { label: "Total Orders", value: safeOrders.length },
+                { label: "Delivered", value: safeOrders.filter((o) => o.status === "Delivered").length },
+                { label: "Processing", value: safeOrders.filter((o) => o.status === "Processing").length },
               ].map(({ label, value }) => (
                 <div key={label} className="flex items-center justify-between py-2.5 border-b border-[#F0E0E5] last:border-b-0">
                   <span className="text-xs text-[#6B6B6B]">{label}</span>
@@ -147,15 +152,15 @@ export default function Profile() {
               <div key={order.id} className="bg-white rounded-2xl border border-[#F0E0E5] p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-sm font-semibold text-[#1C1C1C]">{order.id}</p>
-                    <p className="text-xs text-[#6B6B6B]">{order.date}</p>
+                    <p className="text-sm font-semibold text-[#1C1C1C]">Order #{order.id}</p>
+                    <p className="text-xs text-[#6B6B6B]">{new Date(order.created_at || order.date).toLocaleDateString()}</p>
                   </div>
                   <Badge variant={STATUS_BADGE[order.status] || "gray"}>{order.status}</Badge>
                 </div>
                 <div className="flex gap-2 mb-3">
                   {order.items.slice(0, 3).map((item, i) => (
                     <div key={i} className="w-12 h-12 rounded-xl overflow-hidden border border-[#F0E0E5] flex-shrink-0">
-                      <SafeImage src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <SafeImage src={resolveImageUrl(item.product_image || item.image || "")} alt={item.product_name || item.name} className="w-full h-full object-cover" />
                     </div>
                   ))}
                   {order.items.length > 3 && (
@@ -166,10 +171,15 @@ export default function Profile() {
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-[#6B6B6B]">{order.items.length} item{order.items.length > 1 ? "s" : ""}</p>
-                  <p className="text-sm font-bold text-[#1C1C1C]">{formatPrice(order.total)}</p>
+                  <p className="text-sm font-bold text-[#1C1C1C]">{formatPrice(order.total_amount || order.total)}</p>
                 </div>
               </div>
             ))}
+            {recentOrders.length === 0 && (
+              <div className="bg-white rounded-2xl border border-[#F0E0E5] p-5 text-center text-sm text-[#6B6B6B]">
+                No recent orders found.
+              </div>
+            )}
           </div>
         </div>
       </div>

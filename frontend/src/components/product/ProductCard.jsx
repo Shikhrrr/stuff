@@ -1,23 +1,27 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext";
-import { formatPrice } from "../../data/products";
 import Badge from "../ui/Badge";
+import { resolveImageUrl } from "../../api/client";
 import SafeImage from "../ui/SafeImage";
+
+// Simple local formatPrice fallback
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(price);
 
 export default function ProductCard({ product, compact = false }) {
   const { addToCart, items } = useCart();
   const [adding, setAdding] = useState(false);
 
   const inCart = items.some((i) => i.product.id === product.id);
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discount = product.original_price
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : null;
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!product.inStock || adding) return;
+    if (!product.in_stock || adding) return;
     const defaultSize = product.sizes?.[0];
     addToCart(product, defaultSize, 1);
     setAdding(true);
@@ -37,7 +41,7 @@ export default function ProductCard({ product, compact = false }) {
       {/* Image area */}
       <div className={`relative overflow-hidden bg-[#FDF5F7] ${compact ? "aspect-[3/3.5]" : "aspect-[3/3.5]"}`}>
         <SafeImage
-          src={product.image}
+          src={resolveImageUrl(product.primary_image_url)}
           alt={product.name}
           className="transition-transform duration-500 group-hover:scale-105"
         />
@@ -53,7 +57,7 @@ export default function ProductCard({ product, compact = false }) {
           {product.tags.includes("trending") && (
             <Badge variant="amber">Trending</Badge>
           )}
-          {!product.inStock && (
+          {!product.in_stock && (
             <Badge variant="gray">Out of Stock</Badge>
           )}
         </div>
@@ -63,11 +67,11 @@ export default function ProductCard({ product, compact = false }) {
           <button
             type="button"
             onClick={handleQuickAdd}
-            disabled={!product.inStock || adding}
+            disabled={!product.in_stock || adding}
             className="w-full bg-[#E8879A] text-white py-2.5 text-xs font-semibold tracking-wide disabled:bg-[#D4687C] disabled:cursor-not-allowed transition-colors hover:bg-[#D4687C]"
             aria-label={`Quick add ${product.name} to cart`}
           >
-            {adding ? "Added ✓" : !product.inStock ? "Out of Stock" : "Quick Add"}
+            {adding ? "Added ✓" : !product.in_stock ? "Out of Stock" : "Quick Add"}
           </button>
         </div>
       </div>
@@ -102,8 +106,8 @@ export default function ProductCard({ product, compact = false }) {
         {/* Price */}
         <div className="flex items-baseline gap-2 mt-1">
           <span className="text-sm font-bold text-[#1C1C1C]">{formatPrice(product.price)}</span>
-          {product.originalPrice && (
-            <span className="text-xs text-[#BCBCBC] line-through">{formatPrice(product.originalPrice)}</span>
+          {product.original_price && (
+            <span className="text-xs text-[#BCBCBC] line-through">{formatPrice(product.original_price)}</span>
           )}
         </div>
 

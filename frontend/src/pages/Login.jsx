@@ -16,7 +16,7 @@ export default function Login() {
     if (!form.email) e.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Enter a valid email";
     if (!form.password) e.password = "Password is required";
-    else if (form.password.length < 6) e.password = "Password must be at least 6 characters";
+    else if (form.password.length < 4) e.password = "Password must be at least 4 characters";
     return e;
   };
 
@@ -25,11 +25,10 @@ export default function Login() {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800)); // Simulated network
-    const ok = login(form.email, form.password);
+    const ok = await login(form.email, form.password);
     setLoading(false);
-    if (ok) navigate("/");
-    else setErrors({ password: "Invalid credentials. Try any email + 6+ char password." });
+    if (ok) navigate(ok.is_staff || ok.is_superuser ? "/control-panel" : "/");
+    else setErrors({ password: "Invalid email or password. Please try again." });
   };
 
   const set = (field) => (e) => setForm((p) => ({ ...p, [field]: e.target.value }));

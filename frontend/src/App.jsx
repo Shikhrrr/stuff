@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import Layout from "./components/layout/Layout";
+import AdminLayout from "./components/layout/AdminLayout";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -13,6 +15,10 @@ import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import StoreLocation from "./pages/StoreLocation";
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 function NotFound() {
   return (
@@ -32,26 +38,40 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <CartProvider>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              {/* Category pages */}
-              <Route path="/women" element={<CategoryPage />} />
-              <Route path="/men" element={<CategoryPage />} />
-              <Route path="/kids" element={<CategoryPage />} />
-              {/* App pages */}
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/location" element={<StoreLocation />} />
-              {/* 404 */}
+          <Routes>
+            {/* Control Panel Routes (Custom Admin Dashboard) */}
+            <Route path="/control-panel" element={<ProtectedRoute requireAdmin={true} />}>
+              <Route element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="products" element={<AdminProducts />} />
+                <Route path="orders" element={<AdminOrders />} />
+              </Route>
+            </Route>
+
+            {/* Main Storefront Routes */}
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="login" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
+              <Route path="product/:id" element={<ProductDetail />} />
+              
+              <Route path="women" element={<CategoryPage />} />
+              <Route path="men" element={<CategoryPage />} />
+              <Route path="kids" element={<CategoryPage />} />
+              
+              <Route path="cart" element={<Cart />} />
+              <Route path="checkout" element={<Checkout />} />
+              
+              <Route element={<ProtectedRoute />}>
+                <Route path="profile" element={<Profile />} />
+                <Route path="orders" element={<Orders />} />
+              </Route>
+              
+              <Route path="location" element={<StoreLocation />} />
+              
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
+            </Route>
+          </Routes>
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>
