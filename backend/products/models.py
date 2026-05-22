@@ -23,8 +23,9 @@ class Product(models.Model):
     # Store tags as JSON array e.g., ["trending", "new"]
     tags = models.JSONField(default=list, blank=True)
     
-    # Primary image (fallback/shortcut)
-    primary_image_url = models.URLField(max_length=500, blank=True)
+    # Primary image stored on ImageKit CDN
+    image = models.URLField(max_length=500, blank=True, null=True)
+    imagekit_file_id = models.CharField(max_length=255, blank=True, null=True)
     
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=5.0)
     reviews = models.IntegerField(default=0)
@@ -38,15 +39,9 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
-    image_url = models.URLField(max_length=500, blank=True)
-    # If we upload locally later:
-    image_file = models.ImageField(upload_to='products/', null=True, blank=True)
+    image = models.URLField(max_length=500, blank=True, null=True)
+    imagekit_file_id = models.CharField(max_length=255, blank=True, null=True)
     order = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['order']
-
-    def get_url(self):
-        if self.image_file:
-            return self.image_file.url
-        return self.image_url

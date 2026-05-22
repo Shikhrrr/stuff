@@ -162,13 +162,13 @@ class Command(BaseCommand):
                     'rating': prod['rating'],
                     'reviews': prod['reviews'],
                     'in_stock': prod['inStock'],
-                    'primary_image_url': prod['image']
+                    'image': prod['image']
                 }
             )
             # Gallery
             p.gallery.all().delete()
             for idx, img in enumerate(prod['gallery']):
-                ProductImage.objects.create(product=p, image_url=img, order=idx)
+                ProductImage.objects.create(product=p, image=img, order=idx)
 
         self.stdout.write('Seeding Store Settings...')
         settings = StoreSettings.load()

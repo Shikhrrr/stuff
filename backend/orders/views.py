@@ -54,7 +54,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 order=order,
                 product=item.product,
                 product_name=item.product.name,
-                product_image=item.product.primary_image_url,
+                product_image=item.product.image or '',
                 size=item.size,
                 qty=item.quantity,
                 price=item.product.price
