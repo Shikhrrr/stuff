@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import ProductCard from "../components/product/ProductCard";
 import { apiClient } from "../api/client";
+import { getCategoryBanner } from "../constants/categoryBanners";
 
 const SORT_OPTIONS = [
   { value: "default", label: "Featured" },
@@ -37,7 +38,7 @@ export default function CategoryPage() {
         setAllProducts(prodData);
       } catch (err) {
         console.error("Error fetching category data", err);
-        setMeta({ label: "Shoes", description: "", emoji: "👟" });
+        setMeta({ label: "Shoes", description: "" });
         setAllProducts([]);
       } finally {
         setLoading(false);
@@ -64,23 +65,36 @@ export default function CategoryPage() {
     );
   }
 
+  const banner = getCategoryBanner(categoryId);
+
   return (
     <div className="grid-bg-subtle min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-[#F0E0E5] py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center gap-2 text-sm text-[#6B6B6B] mb-4" aria-label="Breadcrumb">
+      {/* Category hero banner */}
+      <div className="relative overflow-hidden border-b border-[#F0E0E5]">
+        <img
+          src={banner.src}
+          alt={banner.alt}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: banner.objectPosition }}
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5]/97 via-[#FAF8F5]/88 to-transparent sm:via-[#FAF8F5]/75" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF8F5]/30 to-transparent" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 min-h-[220px] sm:min-h-[260px] flex flex-col justify-end">
+          <nav className="flex items-center gap-2 text-sm text-[#6B6B6B] mb-5" aria-label="Breadcrumb">
             <Link to="/" className="hover:text-[#E8879A] transition-colors">Home</Link>
             <span>/</span>
             <span className="text-[#1C1C1C] font-medium">{meta.label}</span>
           </nav>
-          <div className="flex items-end justify-between">
-            <div>
-              <span className="text-3xl mb-2 block">{meta.emoji}</span>
+          <div className="flex items-end justify-between gap-6">
+            <div className="max-w-xl">
               <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#1C1C1C]">{meta.label}</h1>
-              <p className="text-sm text-[#6B6B6B] mt-2 max-w-lg">{meta.description}</p>
+              <p className="text-sm sm:text-base text-[#6B6B6B] mt-2">{meta.description}</p>
             </div>
-            <span className="text-sm text-[#6B6B6B] hidden sm:block">{allProducts.length} products</span>
+            <span className="hidden sm:inline-flex text-sm text-[#6B6B6B] bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-[#F0E0E5] whitespace-nowrap">
+              {allProducts.length} products
+            </span>
           </div>
         </div>
       </div>

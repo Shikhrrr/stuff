@@ -110,26 +110,26 @@ export default function Footer() {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 mt-0.5 text-[#E8879A] flex-shrink-0">
                   <path fillRule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.313-.066l.003-.001.016-.007.052-.023A10.14 10.14 0 0 0 12 17.538c.205-.221.404-.457.595-.7C14.066 14.95 16 11.89 16 8c0-3.314-2.686-6-6-6S4 4.686 4 8c0 3.89 1.934 6.95 3.405 8.838.191.243.39.479.595.7a10.144 10.144 0 0 0 1.673 1.357l.052.023.016.007Zm.31-8.933a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" clipRule="evenodd"/>
                 </svg>
-                <span>Kalyanpur, Kanpur<br/>Uttar Pradesh - 208017</span>
+                <span>337/A2, Purana Shivali Road<br/>Kalyanpur, Kanpur<br/>Uttar Pradesh 208017</span>
               </li>
               <li className="flex items-center gap-2.5 text-sm text-[#6B6B6B]">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-[#E8879A] flex-shrink-0">
                   <path fillRule="evenodd" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h1.148a1.5 1.5 0 0 1 1.465 1.175l.716 3.223a1.5 1.5 0 0 1-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 0 0 6.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 0 1 1.767-1.052l3.223.716A1.5 1.5 0 0 1 18 15.352V16.5a1.5 1.5 0 0 1-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 0 1 2.43 8.326 13.019 13.019 0 0 1 2 5V3.5Z" clipRule="evenodd"/>
                 </svg>
-                <a href="tel:+919876543210" className="hover:text-[#E8879A] transition-colors">+91 98765 43210</a>
+                <a href="tel:+919651969763" className="hover:text-[#E8879A] transition-colors">+91 96519 69763</a>
               </li>
               <li className="flex items-center gap-2.5 text-sm text-[#6B6B6B]">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-[#E8879A] flex-shrink-0">
                   <path d="M3 4a2 2 0 0 0-2 2v1.161l8.441 4.221a1.25 1.25 0 0 0 1.118 0L19 7.162V6a2 2 0 0 0-2-2H3Z"/>
                   <path d="m19 8.839-7.77 3.885a2.75 2.75 0 0 1-2.46 0L1 8.839V14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.839Z"/>
                 </svg>
-                <a href="mailto:hello@shikharshoes.io" className="hover:text-[#E8879A] transition-colors">hello@shikharshoes.io</a>
+                <a href="mailto:dhirendrakanaujia@gmail.com" className="hover:text-[#E8879A] transition-colors">dhirendrakanaujia@gmail.com</a>
               </li>
               <li className="flex items-center gap-2.5 text-sm text-[#6B6B6B]">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-[#E8879A] flex-shrink-0">
                   <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z" clipRule="evenodd"/>
                 </svg>
-                <span>Mon–Sat: 10am – 8pm</span>
+                <span>Mon–Sun: 10am – 9:30pm</span>
               </li>
             </ul>
           </div>

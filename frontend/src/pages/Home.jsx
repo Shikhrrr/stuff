@@ -6,6 +6,7 @@ import HeroCarousel from "../components/home/HeroCarousel";
 import TrendingStrip from "../components/home/TrendingStrip";
 import CategoryStrip from "../components/home/CategoryStrip";
 import ProductCard from "../components/product/ProductCard";
+import { MAP_EMBED_SRC, STORE_ADDRESS } from "../constants/storeLocation";
 
 const categories = [
   {
@@ -219,9 +220,27 @@ export default function Home() {
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-3">
             Come Visit Our Store
           </h2>
-          <p className="text-white/80 text-base mb-8 max-w-md mx-auto">
-            Located in the heart of Kalyanpur, Kanpur. Come try our collection in person.
+          <p className="text-white/80 text-base mb-6 max-w-lg mx-auto">
+            {STORE_ADDRESS}
           </p>
+
+          <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden border-4 border-white/30 shadow-lg bg-white">
+            <div className="aspect-[16/9] sm:aspect-[2/1] w-full">
+              <iframe
+                src={MAP_EMBED_SRC}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Shikhar Shoes store location on Google Maps"
+                aria-label="Map showing Shikhar Shoes at Purana Shivali Road, Kalyanpur, Kanpur"
+                className="w-full h-full min-h-[220px] sm:min-h-[280px]"
+              />
+            </div>
+          </div>
+
           <Link
             to="/location"
             className="inline-flex items-center gap-2 bg-white text-[#E8879A] font-semibold px-8 py-3.5 rounded-full hover:bg-[#FDE8EE] transition-colors"

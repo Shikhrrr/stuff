@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from products.models import Category, Product, ProductImage
@@ -173,10 +175,11 @@ class Command(BaseCommand):
         self.stdout.write('Seeding Store Settings...')
         settings = StoreSettings.load()
         settings.name = "ShikharShoes"
-        settings.address = "Near Kalyanpur Market\nKalyanpur, Kanpur\nUttar Pradesh - 208017\nIndia"
+        settings.address = "337/A2, Purana Shivali Road\nKalyanpur, Kanpur\nUttar Pradesh 208017\nIndia"
         settings.email = "hello@shikharshoes.io"
         settings.phone = "+91 98765 43210"
-        settings.map_embed_url = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3572.5!2d80.2331!3d26.5123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDMwJzQ0LjMiTiA4MMKwMTMnNTkuMiJF!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+        addr = "337/A2, Purana Shivali Road, Kalyanpur, Kanpur, Uttar Pradesh 208017"
+        settings.map_embed_url = f"https://maps.google.com/maps?q={quote(addr)}&hl=en&z=16&output=embed"
         settings.latitude = 26.5123
         settings.longitude = 80.2331
         settings.save()
