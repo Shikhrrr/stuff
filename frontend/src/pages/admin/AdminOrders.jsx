@@ -78,71 +78,71 @@ export default function AdminOrders() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-[#1C1C1C]">Orders</h1>
-        <div className="relative">
+    <div className="space-y-4 md:space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-xl md:text-2xl font-bold text-[#1C1C1C]">Orders</h1>
+        <div className="relative w-full sm:w-auto">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#BCBCBC] pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search orders..."
-            className="w-56 pl-9 pr-4 py-2 rounded-xl bg-white border border-[#F0E0E5] text-sm text-[#1C1C1C] placeholder:text-[#BCBCBC] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
+            className="w-full sm:w-56 pl-9 pr-4 py-2 rounded-xl bg-white border border-[#F0E0E5] text-xs md:text-sm text-[#1C1C1C] placeholder:text-[#BCBCBC] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
           />
         </div>
       </div>
 
-      <div className="bg-white border border-[#F5C6D0]/30 rounded-3xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-[#F5C6D0]/30 rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-[#F5C6D0]/30 text-xs uppercase tracking-wider text-[#6B6B6B]">
-                <th className="p-4 font-medium">Order ID</th>
-                <th className="p-4 font-medium">Date</th>
-                <th className="p-4 font-medium">Customer</th>
-                <th className="p-4 font-medium">Total</th>
-                <th className="p-4 font-medium">Status</th>
-                <th className="p-4 font-medium text-right">Actions</th>
+              <tr className="bg-gray-50 border-b border-[#F5C6D0]/30 text-[10px] md:text-xs uppercase tracking-wider text-[#6B6B6B]">
+                <th className="p-3 md:p-4 font-medium">Order</th>
+                <th className="p-3 md:p-4 font-medium hidden sm:table-cell">Date</th>
+                <th className="p-3 md:p-4 font-medium hidden md:table-cell">Customer</th>
+                <th className="p-3 md:p-4 font-medium">Total</th>
+                <th className="p-3 md:p-4 font-medium">Status</th>
+                <th className="p-3 md:p-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F5C6D0]/30">
               {filteredOrders.map(order => (
                 <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="p-4 text-sm font-medium text-[#1C1C1C]">#{order.id}</td>
-                  <td className="p-4 text-sm text-[#6B6B6B]">
+                  <td className="p-3 md:p-4 text-xs md:text-sm font-medium text-[#1C1C1C] whitespace-nowrap">#{order.id}</td>
+                  <td className="p-3 md:p-4 text-xs md:text-sm text-[#6B6B6B] hidden sm:table-cell whitespace-nowrap">
                     {order.date ? new Date(order.date).toLocaleDateString('en-IN', {
                       year: 'numeric', month: 'short', day: 'numeric'
                     }) : '-'}
                   </td>
-                  <td className="p-4 text-sm text-[#6B6B6B]">{order.user_email || '-'}</td>
-                  <td className="p-4 text-sm text-[#1C1C1C] font-medium">
+                  <td className="p-3 md:p-4 text-xs md:text-sm text-[#6B6B6B] hidden md:table-cell truncate max-w-[120px]">{order.user_email || '-'}</td>
+                  <td className="p-3 md:p-4 text-xs md:text-sm text-[#1C1C1C] font-medium whitespace-nowrap">
                     {formatPrice(order.total_amount)}
                   </td>
-                  <td className="p-4">
+                  <td className="p-3 md:p-4">
                     <div className="relative inline-block">
                       <select
                         value={order.status || 'Pending'}
                         onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className={`appearance-none px-3 py-1.5 pr-8 rounded-full text-xs font-medium capitalize border-0 cursor-pointer outline-none focus:ring-2 focus:ring-[#E8879A]/40 ${getStatusColor(order.status || 'Pending')}`}
+                        className={`appearance-none px-2 md:px-3 py-1 md:py-1.5 pr-6 md:pr-8 rounded-full text-[10px] md:text-xs font-medium capitalize border-0 cursor-pointer outline-none focus:ring-2 focus:ring-[#E8879A]/40 ${getStatusColor(order.status || 'Pending')}`}
                       >
                         {statuses.map(s => (
                           <option key={s} value={s}>{s}</option>
                         ))}
                       </select>
-                      <ChevronDown className="w-3 h-3 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" />
+                      <ChevronDown className="w-2.5 h-2.5 md:w-3 md:h-3 pointer-events-none absolute right-1.5 md:right-2 top-1/2 -translate-y-1/2" />
                     </div>
                   </td>
-                  <td className="p-4">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="p-3 md:p-4">
+                    <div className="flex items-center justify-end gap-1 md:gap-2">
                       <button
                         onClick={() => toggleExpand(order.id)}
-                        className="p-2 text-[#6B6B6B] hover:text-[#E8879A] hover:bg-[#E8879A]/10 rounded-lg transition-colors"
+                        className="p-1.5 md:p-2 text-[#6B6B6B] hover:text-[#E8879A] hover:bg-[#E8879A]/10 rounded-lg transition-colors"
                       >
                         {expandedId === order.id ? (
-                          <EyeOff className="w-4 h-4" />
+                          <EyeOff className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         ) : (
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         )}
                       </button>
                     </div>
@@ -151,7 +151,7 @@ export default function AdminOrders() {
               ))}
               {filteredOrders.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="p-8 text-center text-[#6B6B6B]">
+                  <td colSpan="6" className="p-6 md:p-8 text-center text-[#6B6B6B] text-sm">
                     {searchQuery ? `No orders matching "${searchQuery}".` : 'No orders found.'}
                   </td>
                 </tr>

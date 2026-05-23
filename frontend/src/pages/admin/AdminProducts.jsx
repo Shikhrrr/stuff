@@ -245,66 +245,66 @@ export default function AdminProducts() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="text-2xl font-bold text-[#1C1C1C]">Products</h1>
-        <div className="flex items-center gap-3">
+    <div className="space-y-4 md:space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-xl md:text-2xl font-bold text-[#1C1C1C]">Products</h1>
+        <div className="flex items-center gap-2 md:gap-3 flex-wrap">
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-white border border-[#F0E0E5] text-sm text-[#1C1C1C] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
+            className="px-3 md:px-4 py-2 rounded-xl bg-white border border-[#F0E0E5] text-xs md:text-sm text-[#1C1C1C] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
           >
             <option value="">All Categories</option>
             {['men', 'women', 'kids'].map(cat => (
               <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
             ))}
           </select>
-          <div className="relative">
+          <div className="relative flex-1 min-w-[140px] max-w-[200px] md:max-w-none">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#BCBCBC] pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
-              className="w-56 pl-9 pr-4 py-2 rounded-xl bg-white border border-[#F0E0E5] text-sm text-[#1C1C1C] placeholder:text-[#BCBCBC] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-white border border-[#F0E0E5] text-xs md:text-sm text-[#1C1C1C] placeholder:text-[#BCBCBC] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
             />
           </div>
           <button
             onClick={openAdd}
-            className="bg-[#E8879A] text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#D4687C] transition-colors"
+            className="bg-[#E8879A] text-white px-3 md:px-4 py-2 rounded-xl flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium hover:bg-[#D4687C] transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add Product
+            <span className="hidden sm:inline">Add Product</span>
           </button>
         </div>
       </div>
 
-      <div className="bg-white border border-[#F5C6D0]/30 rounded-3xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-[#F5C6D0]/30 rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-[#F5C6D0]/30 text-xs uppercase tracking-wider text-[#6B6B6B]">
-                <th className="p-4 font-medium">Product</th>
-                <th className="p-4 font-medium">Category</th>
-                <th className="p-4 font-medium">Price</th>
-                <th className="p-4 font-medium">Stock</th>
-                <th className="p-4 font-medium text-right">Actions</th>
+              <tr className="bg-gray-50 border-b border-[#F5C6D0]/30 text-[10px] md:text-xs uppercase tracking-wider text-[#6B6B6B]">
+                <th className="p-3 md:p-4 font-medium">Product</th>
+                <th className="p-3 md:p-4 font-medium hidden sm:table-cell">Category</th>
+                <th className="p-3 md:p-4 font-medium">Price</th>
+                <th className="p-3 md:p-4 font-medium hidden md:table-cell">Stock</th>
+                <th className="p-3 md:p-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F5C6D0]/30">
               {filteredProducts.map(product => (
                 <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                  <td className="p-3 md:p-4">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
                         {(product.image || product.primary_image_url) && (
                           <img src={product.image || product.primary_image_url} alt={product.name} className="w-full h-full object-cover" />
                         )}
                       </div>
                       <div className="min-w-0">
-                        <span className="font-medium text-[#1C1C1C] truncate max-w-[160px] block">{product.name}</span>
+                        <span className="font-medium text-[#1C1C1C] text-xs md:text-sm truncate max-w-[120px] md:max-w-[160px] block">{product.name}</span>
                         {product.gallery && product.gallery.length > 1 && (
-                          <div className="flex items-center gap-1 mt-1.5">
+                          <div className="hidden md:flex items-center gap-1 mt-1.5">
                             {product.gallery.slice(0, 4).map((url, i) => (
                               <img
                                 key={i}
@@ -322,28 +322,28 @@ export default function AdminProducts() {
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 text-sm text-[#6B6B6B]">{product.category_name || product.category || '-'}</td>
-                  <td className="p-4 text-sm text-[#1C1C1C] font-medium">{formatPrice(product.price)}</td>
-                  <td className="p-4">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  <td className="p-3 md:p-4 text-xs md:text-sm text-[#6B6B6B] hidden sm:table-cell">{product.category_name || product.category || '-'}</td>
+                  <td className="p-3 md:p-4 text-xs md:text-sm text-[#1C1C1C] font-medium whitespace-nowrap">{formatPrice(product.price)}</td>
+                  <td className="p-3 md:p-4 hidden md:table-cell">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-[10px] md:text-xs font-medium ${
                       product.in_stock ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
                     }`}>
                       {product.in_stock ? 'In Stock' : 'Out of Stock'}
                     </span>
                   </td>
-                  <td className="p-4">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="p-3 md:p-4">
+                    <div className="flex items-center justify-end gap-1 md:gap-2">
                       <button
                         onClick={() => openEdit(product)}
-                        className="p-2 text-[#6B6B6B] hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-1.5 md:p-2 text-[#6B6B6B] hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(product.id)}
-                        className="p-2 text-[#6B6B6B] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-1.5 md:p-2 text-[#6B6B6B] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                       </button>
                     </div>
                   </td>
@@ -351,7 +351,7 @@ export default function AdminProducts() {
               ))}
               {filteredProducts.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="p-8 text-center text-[#6B6B6B]">
+                  <td colSpan="5" className="p-6 md:p-8 text-center text-[#6B6B6B] text-sm">
                     {searchQuery ? `No products matching "${searchQuery}".` : 'No products found.'}
                   </td>
                 </tr>
