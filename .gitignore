@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+backend/venv/
+.venv/
+env/
+
+# Build output
+dist/
+dist-ssr/
+*.local
+
+# Environment & secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+
+# Django
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+*.log
+
+# Data dumps (may contain user data)
+backend/data.json
+
+# OS & editors
+.DS_Store
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor (keep shared VS Code extensions list if present)
+.vscode/*
+!.vscode/extensions.json
