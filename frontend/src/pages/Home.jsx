@@ -34,7 +34,7 @@ function SearchResults({ query }) {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        const data = await apiClient(`/products/?search=${encodeURIComponent(query)}`);
+        const data = await apiClient(`/api/products/?search=${encodeURIComponent(query)}`);
         setResults(data);
       } catch (err) {
         console.error("Search failed", err);

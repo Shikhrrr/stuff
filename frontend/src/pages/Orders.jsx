@@ -116,7 +116,7 @@ export default function Orders() {
   const handleCancel = async (orderId) => {
     if (!window.confirm('Are you sure you want to cancel this order?')) return;
     try {
-      await apiClient(`/orders/${orderId}/cancel/`, { method: 'POST' });
+      await apiClient(`/api/orders/${orderId}/cancel/`, { method: 'POST' });
       await refreshOrders();
     } catch (err) {
       console.error('Failed to cancel order', err);

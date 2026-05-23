@@ -31,7 +31,7 @@ export default function AdminOrders() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const data = await apiClient('/orders/');
+      const data = await apiClient('/api/orders/');
       setOrders(data);
     } catch (err) {
       console.error("Failed to load orders", err);
@@ -42,7 +42,7 @@ export default function AdminOrders() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await apiClient(`/orders/${orderId}/`, {
+      await apiClient(`/api/orders/${orderId}/`, {
         method: 'PATCH',
         body: { status: newStatus },
       });

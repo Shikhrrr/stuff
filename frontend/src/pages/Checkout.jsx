@@ -52,7 +52,7 @@ export default function Checkout() {
     setLoading(true);
     try {
       const shippingAddress = `${form.fullName}, ${form.phone}, ${form.address}, ${form.city}, ${form.state} - ${form.pincode}`;
-      await apiClient('/orders/', {
+      await apiClient('/api/orders/', {
         method: 'POST',
         body: { shipping_address: shippingAddress },
       });

@@ -11,7 +11,7 @@ export default function HeroCarousel() {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const data = await apiClient('/store/slides/');
+        const data = await apiClient('/api/store/slides/');
         setHeroSlides(data);
       } catch (err) {
         console.error("Failed to fetch slides", err);

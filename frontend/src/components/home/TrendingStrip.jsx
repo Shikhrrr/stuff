@@ -14,7 +14,7 @@ export default function TrendingStrip() {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const data = await apiClient('/products/trending/');
+        const data = await apiClient('/api/products/trending/');
         setTrending(data);
       } catch (err) {
         console.error("Failed to fetch trending products", err);

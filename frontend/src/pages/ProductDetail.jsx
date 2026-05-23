@@ -31,8 +31,8 @@ export default function ProductDetail() {
       setLoading(true);
       try {
         const [prodData, relatedData] = await Promise.all([
-          apiClient(`/products/${id}/`),
-          apiClient(`/products/${id}/related/`)
+          apiClient(`/api/products/${id}/`),
+          apiClient(`/api/products/${id}/related/`)
         ]);
         setProduct(prodData);
         setRelated(relatedData);

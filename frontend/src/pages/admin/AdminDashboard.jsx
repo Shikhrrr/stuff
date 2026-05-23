@@ -10,8 +10,8 @@ export default function AdminDashboard() {
     async function fetchStats() {
       try {
         const [products, orders] = await Promise.all([
-          apiClient('/products/'),
-          apiClient('/orders/')
+          apiClient('/api/products/'),
+          apiClient('/api/orders/')
         ]);
         
         const activeOrders = orders.filter(o => o.status !== 'Cancelled');

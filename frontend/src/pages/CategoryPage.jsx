@@ -31,8 +31,8 @@ export default function CategoryPage() {
       setLoading(true);
       try {
         const [catData, prodData] = await Promise.all([
-          apiClient(`/categories/${categoryId}/`),
-          apiClient(`/products/?category=${categoryId}`)
+          apiClient(`/api/categories/${categoryId}/`),
+          apiClient(`/api/products/?category=${categoryId}`)
         ]);
         setMeta(catData);
         setAllProducts(prodData);

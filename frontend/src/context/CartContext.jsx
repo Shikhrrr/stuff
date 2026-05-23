@@ -14,7 +14,7 @@ export function CartProvider({ children }) {
       return;
     }
     try {
-      const data = await apiClient('/cart/');
+      const data = await apiClient('/api/cart/');
       if (data && data.items) {
         // Map API format to expected frontend format
         const formattedItems = data.items.map(item => ({
@@ -41,7 +41,7 @@ export function CartProvider({ children }) {
       return;
     }
     try {
-      await apiClient('/cart/items/', {
+      await apiClient('/api/cart/items/', {
         body: { product: product.id, size, quantity }
       });
       await fetchCart();
@@ -54,7 +54,7 @@ export function CartProvider({ children }) {
     const item = items.find(i => i.key === key);
     if (!item) return;
     try {
-      await apiClient(`/cart/items/${item.apiId}/`, { method: 'DELETE' });
+      await apiClient(`/api/cart/items/${item.apiId}/`, { method: 'DELETE' });
       await fetchCart();
     } catch (err) {
       console.error("Error removing from cart", err);
@@ -70,7 +70,7 @@ export function CartProvider({ children }) {
     
     try {
       // The API expects full fields on update or we can use PATCH
-      await apiClient(`/cart/items/${item.apiId}/`, {
+      await apiClient(`/api/cart/items/${item.apiId}/`, {
         method: 'PATCH',
         body: { quantity }
       });
@@ -82,7 +82,7 @@ export function CartProvider({ children }) {
 
   const clearCart = async () => {
     try {
-      await apiClient('/cart/clear/', { method: 'POST' });
+      await apiClient('/api/cart/clear/', { method: 'POST' });
       await fetchCart();
     } catch (err) {
       console.error("Error clearing cart", err);

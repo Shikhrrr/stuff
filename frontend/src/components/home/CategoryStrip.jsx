@@ -11,7 +11,7 @@ export default function CategoryStrip({ category, label, description }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await apiClient(`/products/?category=${category}`);
+        const data = await apiClient(`/api/products/?category=${category}`);
         // We only want to show 8 items max on the home page strip
         setProducts(data.slice(0, 8));
       } catch (err) {

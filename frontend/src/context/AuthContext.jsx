@@ -10,9 +10,9 @@ export function AuthProvider({ children }) {
 
   const fetchUserData = async () => {
     try {
-      const userData = await apiClient('/auth/me/');
+      const userData = await apiClient('/api/auth/me/');
       setUser(userData);
-      const ordersData = await apiClient('/orders/');
+      const ordersData = await apiClient('/api/orders/');
       setOrders(ordersData);
     } catch (err) {
       removeAuthToken();
@@ -32,14 +32,14 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const data = await apiClient('/auth/login/', {
+      const data = await apiClient('/api/auth/login/', {
         body: { email, password }
       });
       if (data.access) {
         setAuthToken(data.access);
         await fetchUserData();
         // Return the latest user state from a fresh API call to avoid stale closure
-        const userData = await apiClient('/auth/me/');
+        const userData = await apiClient('/api/auth/me/');
         return userData;
       }
       return null;
@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
 
   const signup = async (data) => {
     try {
-      await apiClient('/auth/register/', {
+      await apiClient('/api/auth/register/', {
         body: {
           email: data.email,
           password: data.password,
@@ -75,7 +75,7 @@ export function AuthProvider({ children }) {
 
   const refreshOrders = async () => {
     try {
-      const ordersData = await apiClient('/orders/');
+      const ordersData = await apiClient('/api/orders/');
       setOrders(ordersData);
     } catch (err) {
       console.error("Failed to refresh orders", err);
@@ -90,7 +90,7 @@ export function AuthProvider({ children }) {
         phone: updates.phone !== undefined ? updates.phone : user.phone,
         address: updates.address !== undefined ? updates.address : user.address,
       };
-      const updatedUser = await apiClient('/auth/me/', {
+      const updatedUser = await apiClient('/api/auth/me/', {
         method: 'PATCH',
         body: backendUpdates
       });

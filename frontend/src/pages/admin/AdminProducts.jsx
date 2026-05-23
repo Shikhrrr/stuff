@@ -43,7 +43,7 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const data = await apiClient('/products/');
+      const data = await apiClient('/api/products/');
       setProducts(data);
     } catch (err) {
       console.error("Failed to load products", err);
@@ -54,7 +54,7 @@ export default function AdminProducts() {
 
   const fetchCategories = async () => {
     try {
-      const data = await apiClient('/categories/');
+      const data = await apiClient('/api/categories/');
       setCategories(data);
     } catch (err) {
       console.error("Failed to load categories", err);
@@ -169,9 +169,9 @@ export default function AdminProducts() {
       if (hasUploads) {
         const fd = buildFormData(allGalleryUrls);
         if (editing) {
-          await apiUpload(`/products/${editing.id}/`, fd, { method: 'PUT' });
+          await apiUpload(`/api/products/${editing.id}/`, fd, { method: 'PUT' });
         } else {
-          await apiUpload('/products/', fd);
+          await apiUpload('/api/products/', fd);
         }
       } else {
         const body = {
@@ -190,9 +190,9 @@ export default function AdminProducts() {
         }
 
         if (editing) {
-          await apiClient(`/products/${editing.id}/`, { method: 'PUT', body });
+          await apiClient(`/api/products/${editing.id}/`, { method: 'PUT', body });
         } else {
-          await apiClient('/products/', { method: 'POST', body });
+          await apiClient('/api/products/', { method: 'POST', body });
         }
       }
 
@@ -209,7 +209,7 @@ export default function AdminProducts() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      await apiClient(`/products/${id}/`, { method: 'DELETE' });
+      await apiClient(`/api/products/${id}/`, { method: 'DELETE' });
       setProducts(products.filter(p => p.id !== id));
     } catch (err) {
       console.error("Failed to delete product", err);
