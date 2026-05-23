@@ -29,9 +29,13 @@ env.read_env(BASE_DIR / '.env')
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com",
+]
 
 IMAGEKIT_PUBLIC_KEY = env('IMAGEKIT_PUBLIC_KEY')
 IMAGEKIT_PRIVATE_KEY = env('IMAGEKIT_PRIVATE_KEY')
@@ -40,6 +44,7 @@ IMAGEKIT_URL_ENDPOINT = env('IMAGEKIT_URL_ENDPOINT')
 # Application definition
 
 INSTALLED_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,6 +67,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -154,7 +160,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
