@@ -52,7 +52,7 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-screen grid-bg-subtle flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-[#E8879A] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -60,7 +60,7 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-4">
+      <div className="min-h-screen grid-bg-subtle flex flex-col items-center justify-center gap-4 px-4">
         <p className="text-5xl">👟</p>
         <h1 className="font-display text-2xl font-bold text-[#1C1C1C]">Product Not Found</h1>
         <p className="text-[#6B6B6B] text-sm">This shoe has walked away.</p>
@@ -89,6 +89,7 @@ export default function ProductDetail() {
   };
 
   return (
+    <div className="min-h-screen grid-bg-subtle">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-[#6B6B6B] mb-8" aria-label="Breadcrumb">
@@ -272,6 +273,7 @@ export default function ProductDetail() {
           </div>
         </section>
       )}
+    </div>
     </div>
   );
 }
