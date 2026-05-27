@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { apiClient } from "../api/client";
 import SafeImage from "../components/ui/SafeImage";
 import ProductCard from "../components/product/ProductCard";
@@ -14,6 +15,7 @@ const formatPrice = (price) =>
 export default function ProductDetail() {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
@@ -74,6 +76,7 @@ export default function ProductDetail() {
     : null;
 
   const handleAddToCart = () => {
+    if (!user) { navigate('/login?redirect=' + encodeURIComponent(window.location.pathname)); return; }
     if (!selectedSize) { setSizeError(true); return; }
     setSizeError(false);
     addToCart(product, selectedSize, quantity);
@@ -82,6 +85,7 @@ export default function ProductDetail() {
   };
 
   const handleBuyNow = () => {
+    if (!user) { navigate('/login?redirect=' + encodeURIComponent(window.location.pathname)); return; }
     if (!selectedSize) { setSizeError(true); return; }
     setSizeError(false);
     addToCart(product, selectedSize, quantity);

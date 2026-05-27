@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
@@ -7,6 +7,8 @@ import Button from "../components/ui/Button";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,7 @@ export default function Login() {
     setLoading(true);
     const ok = await login(form.email, form.password);
     setLoading(false);
-    if (ok) navigate(ok.is_staff || ok.is_superuser ? "/control-panel" : "/");
+    if (ok) navigate(ok.is_staff || ok.is_superuser ? "/control-panel" : redirectTo);
     else setErrors({ password: "Invalid email or password. Please try again." });
   };
 

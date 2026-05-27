@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import Badge from "../ui/Badge";
 import SafeImage from "../ui/SafeImage";
 
@@ -10,6 +11,8 @@ const formatPrice = (price) =>
 
 export default function ProductCard({ product, compact = false }) {
   const { addToCart, items } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [adding, setAdding] = useState(false);
 
   const inCart = items.some((i) => i.product.id === product.id);
@@ -20,6 +23,7 @@ export default function ProductCard({ product, compact = false }) {
   const handleQuickAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!user) { navigate('/login?redirect=' + encodeURIComponent(window.location.pathname)); return; }
     if (!product.in_stock || adding) return;
     const defaultSize = product.sizes?.[0];
     addToCart(product, defaultSize, 1);
