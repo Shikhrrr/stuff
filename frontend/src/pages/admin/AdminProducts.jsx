@@ -8,6 +8,7 @@ const emptyForm = {
   category: '',
   price: '',
   original_price: '',
+  discount_percent: '',
   description: '',
   sizes: '',
   image: '',
@@ -79,6 +80,7 @@ export default function AdminProducts() {
       category: product.category || '',
       price: product.price || '',
       original_price: product.original_price || '',
+      discount_percent: product.discount_percent || '',
       description: product.description || '',
       sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : '',
       image: product.image || product.primary_image_url || '',
@@ -100,10 +102,20 @@ export default function AdminProducts() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    setForm(prev => {
+      const next = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      };
+      if ((name === 'original_price' || name === 'discount_percent') && next.original_price && next.discount_percent) {
+        const orig = parseFloat(next.original_price);
+        const disc = parseFloat(next.discount_percent);
+        if (!isNaN(orig) && !isNaN(disc) && disc >= 0 && disc <= 100) {
+          next.price = (orig - (orig * disc / 100)).toFixed(2);
+        }
+      }
+      return next;
+    });
   };
 
   const addUrl = () => {
@@ -134,6 +146,7 @@ export default function AdminProducts() {
     fd.append('category', form.category);
     fd.append('price', String(parseFloat(form.price)));
     if (form.original_price) fd.append('original_price', String(parseFloat(form.original_price)));
+    if (form.discount_percent) fd.append('discount_percent', String(parseFloat(form.discount_percent)));
     fd.append('description', form.description);
     fd.append('in_stock', form.in_stock ? 'true' : 'false');
     if (form.image) fd.append('image', form.image);
@@ -179,6 +192,7 @@ export default function AdminProducts() {
           category: form.category,
           price: parseFloat(form.price),
           original_price: form.original_price ? parseFloat(form.original_price) : null,
+          discount_percent: form.discount_percent ? parseFloat(form.discount_percent) : null,
           description: form.description,
           sizes: form.sizes.split(',').map(s => s.trim()).filter(Boolean),
           image: form.image || null,
@@ -408,7 +422,7 @@ export default function AdminProducts() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#1C1C1C] mb-1">Price *</label>
+                  <label className="block text-sm font-medium text-[#1C1C1C] mb-1">Selling Price *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -420,7 +434,7 @@ export default function AdminProducts() {
                   />
                 </div>
 
-                <div className="col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-[#1C1C1C] mb-1">Original Price</label>
                   <input
                     type="number"
@@ -428,6 +442,20 @@ export default function AdminProducts() {
                     name="original_price"
                     value={form.original_price}
                     onChange={handleChange}
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#E0D0D5] text-sm focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#1C1C1C] mb-1">Discount %</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    name="discount_percent"
+                    value={form.discount_percent}
+                    onChange={handleChange}
+                    placeholder="e.g. 20"
                     className="w-full px-4 py-2.5 rounded-xl border border-[#E0D0D5] text-sm focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40"
                   />
                 </div>

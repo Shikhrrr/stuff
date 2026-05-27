@@ -88,24 +88,6 @@ export default function ProductCard({ product, compact = false }) {
           {product.name}
         </h3>
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 mt-0.5">
-          <div className="flex items-center gap-0.5">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <svg
-                key={star}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                className={`w-3 h-3 ${star <= Math.round(product.rating) ? "text-amber-400" : "text-gray-200"}`}
-                fill="currentColor"
-              >
-                <path d="M7.657 2.036a.4.4 0 0 1 .686 0l1.657 2.9 3.217.606a.4.4 0 0 1 .21.67L11.2 8.425l.477 3.242a.4.4 0 0 1-.573.41L8 10.605l-3.104 1.472a.4.4 0 0 1-.573-.41l.477-3.242L2.573 6.212a.4.4 0 0 1 .21-.67l3.217-.606 1.657-2.9Z"/>
-              </svg>
-            ))}
-          </div>
-          <span className="text-[10px] text-[#6B6B6B]">({product.reviews})</span>
-        </div>
-
         {/* Price */}
         <div className="flex items-baseline gap-2 mt-1">
           <span className="text-sm font-bold text-[#1C1C1C]">{formatPrice(product.price)}</span>
