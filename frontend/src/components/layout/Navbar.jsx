@@ -74,7 +74,7 @@ export default function Navbar() {
           {/* Desktop Search */}
           <div className="hidden md:flex flex-1 max-w-md mx-6">
             <div className="relative w-full">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#BCBCBC] pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#A0A0A0] pointer-events-none">
                 <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clipRule="evenodd"/>
               </svg>
               <input
@@ -92,7 +92,7 @@ export default function Navbar() {
                   }
                 }}
                 placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-2 rounded-full bg-[#FDF5F7] border border-[#F0E0E5] text-sm text-[#1C1C1C] placeholder:text-[#BCBCBC] focus:outline-none focus:ring-2 focus:ring-[#E8879A] focus:border-[#E8879A] transition-all"
+                className="w-full pl-10 pr-4 py-2 rounded-full bg-white border border-[#E8D0D8] text-sm text-[#1C1C1C] placeholder:text-[#9C9C9C] focus:outline-none focus:ring-2 focus:ring-[#E8879A] focus:border-[#E8879A] shadow-sm transition-all"
               />
               {searchQuery && (
                 <button
@@ -285,7 +285,7 @@ export default function Navbar() {
           {/* Mobile Search + Profile Row */}
           <div className="md:hidden border-t border-[#F0E0E5] bg-[#FAF8F5] px-4 py-2 flex items-center gap-2">
             <div className="relative flex-1">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#BCBCBC] pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#A0A0A0] pointer-events-none">
                 <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clipRule="evenodd"/>
               </svg>
               <input
@@ -299,7 +299,7 @@ export default function Navbar() {
                   }
                 }}
                 placeholder="Search products..."
-                className="w-full pl-9 pr-3 py-2 rounded-full bg-white border border-[#F0E0E5] text-sm text-[#1C1C1C] placeholder:text-[#BCBCBC] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
+                className="w-full pl-9 pr-3 py-2 rounded-full bg-white border border-[#E8D0D8] text-sm text-[#1C1C1C] placeholder:text-[#9C9C9C] focus:outline-none focus:ring-2 focus:ring-[#E8879A]/40 transition-all"
               />
             </div>
             {user ? (
